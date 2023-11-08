@@ -8,8 +8,8 @@ const ChatWindow = (props) => {
 
     return(
         <div className={classes.main_window}>
-            <UsersWindow></UsersWindow>
-            <UserChat></UserChat>
+            <UsersWindow userName={props.userName}></UsersWindow>
+            <UserChat userName={props.userName}></UserChat>
         </div>
     )
 }

@@ -7,7 +7,7 @@ const UsersWindow = (props) => {
 
     return(
         <div className={classes.users_window}>
-            <User></User>
+            <User userName={props.userName}></User>
         </div>
     )
 }
