@@ -1,0 +1,7 @@
+.users_window{
+    min-height: 100vh;
+    background: rgb(128, 70, 128);
+    width: 35%;
+    max-width: 450px;
+    box-shadow: rgba(0, 0, 0, 0.35) 3px 3px 6px;
+}

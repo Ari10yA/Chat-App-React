@@ -1,0 +1,6 @@
+.main_window{
+    min-height: 100vh;
+    background-color: rgb(243, 243, 243);
+    display: flex;
+    width: 100%;
+}
