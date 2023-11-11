@@ -8,8 +8,8 @@ const ChatWindow = (props) => {
 
     return(
         <div className={classes.main_window}>
-            <UsersWindow userName={props.userName}></UsersWindow>
-            <UserChat userName={props.userName} eventHandler={props.eventHandler}></UserChat>
+            <UsersWindow selectedUserHandler={props.selectedUserHandler} selectedUser={props.selectedUser} users={props.users}></UsersWindow>
+            <UserChat selectedUser={props.selectedUser} users={props.users} eventHandler={props.eventHandler}></UserChat>
         </div>
     )
 }

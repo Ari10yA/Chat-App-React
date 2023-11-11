@@ -6,7 +6,32 @@ import classes from "./userChat.module.css";
 const UserChat = (props) => {
 
     const [chatbox, setChatBox] = useState('');
-    const [chats, setChats] = useState([]);
+    const [chats, setChats] = useState(new Map());
+    const [selectedUser, setSelectedUser] = useState('')
+
+    useEffect(() => {
+        setSelectedUser(props.selectedUser);
+    }, [props.selectedUser])
+
+    useEffect(() => {
+        let userArray = props.users.map((user) => {
+            return user.userID
+        })
+        let updatedMap
+        if(chats){
+            let filteredMap = new Map([
+                ...chats.entries(),
+                ...userArray
+                  .filter((key) => !chats.has(key))
+                  .map((newKey) => [newKey, []]),
+              ]);
+
+            updatedMap = new Map(Array.from(filteredMap).filter(([key, value]) => userArray.includes(key)));
+        }
+        setChats(updatedMap);
+       
+
+    }, [props.users])
 
     const formSubmitHandler = (event) => {
         event.preventDefault();
@@ -15,48 +40,72 @@ const UserChat = (props) => {
         }
         
         setChats(previous => {
-            return [
-                ...previous,
-                {
-                    message: chatbox,
-                    by: "self"
-                }
-            ]
+            const newState = new Map(previous);
+
+            newState.set(selectedUser, [...newState.get(selectedUser), { 
+                message: chatbox,
+                by: "self"
+            }])
+            return newState
         });
         setChatBox('');
         console.log(chatbox);
     }
 
-    let allChats = chats.map((chat, index) => {
-        if(chat.by=="self"){
-            return (
-                <div key={index} className={classes.chat_window__chats__self}>
-                    <span className={classes.chat_window__chats__self_message}>{chat.message}</span>
-                </div>
-            );
-        }
-        else{
-            return (
-                <div key={index} className={classes.chat_window__chats__other}>
-                    <span className={classes.chat_window__chats__other_message}>{chat.message}</span>
-                </div>
-            );
-        }
+
+
+    let userDetails = props.users.filter(user => {
+        return user.userID==props.selectedUser;
     })
+    
+    let userElement;
+    let allChats;
+    let updatedChats;
+    if(userDetails.length>0){
+        userElement = 
+        <>  
+            <p style={{margin: "0"}}>{userDetails[0].username}</p>
+            <span>Online</span>
+        </>
+
+
+        allChats = chats.get(selectedUser);
+        if(allChats){
+            updatedChats = allChats.map((chat, index) => {
+                if(chat.by=="self"){
+                    return (
+                        <div key={index} className={classes.chat_window__chats__self}>
+                            <span className={classes.chat_window__chats__self_message}>{chat.message}</span>
+                        </div>
+                    );
+                }
+                else{
+                    return (
+                        <div key={index} className={classes.chat_window__chats__other}>
+                            <span className={classes.chat_window__chats__other_message}>{chat.message}</span>
+                        </div>
+                    );
+                }
+            })
+        }
+
+    }
 
     
-    
 
+    //  chats.get()
+        
+    
+    console.log(selectedUser);
 
     return(
         <div className={classes.chat_window}>
             <div className={classes.chat_window__header}>
-                <p style={{margin: "0"}}>{props.userName}</p>
-                <span>Online</span>
+                {userElement}           
             </div>
             <div className={classes.chat_window__chats}>
                 {
-                    allChats
+                    updatedChats
                 }                
             </div>
             

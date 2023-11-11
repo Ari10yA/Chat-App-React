@@ -15,6 +15,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [someEvents, setSomeEvents] = useState([]);
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState('')
 
   useEffect(() => {
     if(userName.length !== 0) {
@@ -60,7 +61,21 @@ function App() {
 
   useEffect(() => {
     const onGetUsers = (users) => {
-      console.log(users);
+      let newUsers = users.map((user, index) => {
+        return {
+          ...user,
+          self: user.userID === socket.id
+        }
+      })
+
+      newUsers.sort((a, b) => {
+        if(a.self) return -1;
+        if(b.self) return 1;
+
+        if (a.username < b.username) return -1;
+        return a.username > b.username ? 1 : 0;
+      })
+      setUsers([...newUsers]);
     }
 
     socket.on('users', onGetUsers);
@@ -68,7 +83,7 @@ function App() {
     return () => {
       socket.off('users', onGetUsers);
     }
-  }, users)
+  }, [users])
 
 
   const userNameChangeHandler = ( name ) => {
@@ -79,12 +94,16 @@ function App() {
     socket.emit('some-event', message);
   }
 
+  const selectedUserHandler = (id) => {
+    setSelectedUser(id);
+  }
+
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {
-          userName?<Route path="/main" element={<ChatWindow userName={userName} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
+          userName?<Route path="/main" element={<ChatWindow selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
         }
         <Route path="*" element={<Navigate to="/"></Navigate>}></Route>
       </Routes>
