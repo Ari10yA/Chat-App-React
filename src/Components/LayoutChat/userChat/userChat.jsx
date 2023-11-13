@@ -31,12 +31,26 @@ const UserChat = (props) => {
         setChats(updatedMap);
        
 
-    }, [props.users])
+    }, [props.users]);
+
+    useEffect(() => {
+        if(props.newMessage){
+            setChats(previous => {
+                const newState = new Map(previous);
+    
+                newState.set(props.newMessage.userID, [...newState.get(props.newMessage.userID), { 
+                    message: props.newMessage.message,
+                    by: "other"
+                }])
+                return newState
+            });
+        }
+    }, [props.newMessage])
 
     const formSubmitHandler = (event) => {
         event.preventDefault();
         if(chatbox.length!==0){
-            props.eventHandler(chatbox);
+            props.eventHandler(chatbox, selectedUser);
         }
         
         setChats(previous => {
@@ -50,6 +64,7 @@ const UserChat = (props) => {
         });
         setChatBox('');
         console.log(chatbox);
+
     }
 
 

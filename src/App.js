@@ -13,14 +13,21 @@ import './App.css';
 function App() {
   const [userName, setUserName] = useState('');
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [someEvents, setSomeEvents] = useState([]);
+  const [someEvents, setSomeEvents] = useState(null);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('')
 
   useEffect(() => {
     if(userName.length !== 0) {
+      const sessionID = localStorage.getItem('sessionID');
       socket.auth = {
-        username: userName
+        username: userName,
+      }
+      if(sessionID){
+        socket.auth = {
+          ...socket.auth,
+          sessionID
+        }
       }
       socket.connect();
     }
@@ -32,24 +39,37 @@ function App() {
     function onDisconnect() {
       setIsConnected(false);
     }
-    
 
+    function onGetSession({ sessionID, userID }) {
+      socket.auth = { sessionID };
+      localStorage.setItem("sessionID", sessionID);
+      socket.userID = userID;
+    }
+    
+    
     socket.on('connect', onConnect);
     socket.on("connect_error", (err) => {
       console.log(err);
     });
+    socket.on("session", onGetSession);
     socket.on('disconnect', onDisconnect);
 
     return () => {
       socket.off('connect', onConnect);
-      socket.off('connect-error')
+      socket.off('connect-error');
+      socket.off("session", onGetSession);
       socket.off('disconnect', onDisconnect);
     };
   }, [userName]);
 
   useEffect(() => {
-    function onSomeEvent(value) {
-      setSomeEvents(someEvents.concat(value));
+    function onSomeEvent(msg, id, idr) {
+      const newMessage = {
+        message: msg,
+        userID: id, 
+        to: idr
+      }
+      setSomeEvents(newMessage);
     }
   
     socket.on('some-event', onSomeEvent);
@@ -64,7 +84,7 @@ function App() {
       let newUsers = users.map((user, index) => {
         return {
           ...user,
-          self: user.userID === socket.id
+          self: user.userID === socket.userID
         }
       })
 
@@ -90,8 +110,8 @@ function App() {
     setUserName(name);
   }
 
-  const eventHandler = ( message ) => {
-    socket.emit('some-event', message);
+  const eventHandler = ( message, selectedUser ) => {
+    socket.emit('some-event', message, socket.userID, selectedUser);
   }
 
   const selectedUserHandler = (id) => {
@@ -103,7 +123,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {
-          userName?<Route path="/main" element={<ChatWindow selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
+          userName?<Route path="/main" element={<ChatWindow newMessage={someEvents} selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
         }
         <Route path="*" element={<Navigate to="/"></Navigate>}></Route>
       </Routes>
