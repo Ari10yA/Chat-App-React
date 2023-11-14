@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import socket from "../../../socket";
 
 import classes from "./userChat.module.css";
 
@@ -34,10 +35,28 @@ const UserChat = (props) => {
     }, [props.users]);
 
     useEffect(() => {
+        console.log(props.newMessage);
         if(props.newMessage){
             setChats(previous => {
-                const newState = new Map(previous);
-    
+                let newState = new Map(previous);
+                
+                //in this case message's sender is same of the user so it will check for which user it is sent 
+                if(props.newMessage.userID == socket.userID){
+                    //from and to both are same user (self message)
+                    if(props.newMessage.toID==props.newMessage.userID){
+                        newState.set(props.newMessage.userID, [...newState.get(props.newMessage.userID), { 
+                            message: props.newMessage.message,
+                            by: "self"
+                        }])
+                        return newState;
+                    }
+                    //from the same user but to different user
+                    newState.set(props.newMessage.toID, [...newState.get(props.newMessage.toID), { 
+                        message: props.newMessage.message,
+                        by: "self"
+                    }])
+                    return newState;
+                }
                 newState.set(props.newMessage.userID, [...newState.get(props.newMessage.userID), { 
                     message: props.newMessage.message,
                     by: "other"
@@ -50,21 +69,19 @@ const UserChat = (props) => {
     const formSubmitHandler = (event) => {
         event.preventDefault();
         if(chatbox.length!==0){
-            props.eventHandler(chatbox, selectedUser);
+            props.eventHandler(chatbox, socket.userID, selectedUser );
         }
         
-        setChats(previous => {
-            const newState = new Map(previous);
+        // setChats(previous => {
+        //     const newState = new Map(previous);
 
-            newState.set(selectedUser, [...newState.get(selectedUser), { 
-                message: chatbox,
-                by: "self"
-            }])
-            return newState
-        });
+        //     newState.set(selectedUser, [...newState.get(selectedUser), { 
+        //         message: chatbox,
+        //         by: "self"
+        //     }])
+        //     return newState
+        // });
         setChatBox('');
-        console.log(chatbox);
-
     }
 
 
@@ -106,12 +123,6 @@ const UserChat = (props) => {
 
     }
 
-    
-
-    //  chats.get()
-        
-    
-    console.log(selectedUser);
 
     return(
         <div className={classes.chat_window}>

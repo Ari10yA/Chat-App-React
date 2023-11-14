@@ -26,7 +26,7 @@ function App() {
       if(sessionID){
         socket.auth = {
           ...socket.auth,
-          sessionID
+          sessionID: sessionID
         }
       }
       socket.connect();
@@ -67,7 +67,7 @@ function App() {
       const newMessage = {
         message: msg,
         userID: id, 
-        to: idr
+        toID: idr
       }
       setSomeEvents(newMessage);
     }
@@ -110,7 +110,7 @@ function App() {
     setUserName(name);
   }
 
-  const eventHandler = ( message, selectedUser ) => {
+  const eventHandler = ( message, b, selectedUser ) => {
     socket.emit('some-event', message, socket.userID, selectedUser);
   }
 
