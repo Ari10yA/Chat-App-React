@@ -1,0 +1,13 @@
+.modal{
+    padding: 3rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    z-index: 20; 
+    width: 50%;
+    min-width: 350px;
+    max-width: 450px;
+    min-height: 200px;
+    border-radius: 8px;
+}

@@ -4,7 +4,8 @@ import socket from "./socket.js"
 import Homepage from "./Components/homepage/homepage"
 import ChatWindow from "./Components/LayoutChat/chatwindow"
 import { Route, Routes, Navigate } from "react-router-dom";
-
+import Backdrop from "./Components/Backdrop/Backdrop.jsx";
+import Modal from "./Components/Modal/modal.jsx";
 
 import './App.css';
 
@@ -15,7 +16,8 @@ function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [someEvents, setSomeEvents] = useState(null);
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('')
+  const [selectedUser, setSelectedUser] = useState('');
+  const [displayBackdrop, setDisplayBackdrop] = useState(false);
 
   useEffect(() => {
     if(userName.length !== 0) {
@@ -118,8 +120,18 @@ function App() {
     setSelectedUser(id);
   }
 
+  const displayBackdropHandler = () => {
+    setDisplayBackdrop((previous) => {
+      return !previous;
+    })
+  }
+
   return (
     <div className="App">
+      <button onClick={() => {displayBackdropHandler()}}>Test</button>
+      <Backdrop displayHandler={displayBackdropHandler} classDetails={displayBackdrop}>
+        <Modal></Modal>
+      </Backdrop>
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {

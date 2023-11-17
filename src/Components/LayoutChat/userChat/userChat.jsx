@@ -35,7 +35,6 @@ const UserChat = (props) => {
     }, [props.users]);
 
     useEffect(() => {
-        console.log(props.newMessage);
         if(props.newMessage){
             setChats(previous => {
                 let newState = new Map(previous);
