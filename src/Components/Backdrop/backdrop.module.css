@@ -8,7 +8,9 @@
     top: 0;
     display: none;
     opacity: 0;
-    transition: opacity ease 5s;
+    transform: translateX(-100%);
+    transition: opacity ease 1.7s, transform ease 0.7s;
+
 }
 
 .display{
@@ -19,5 +21,6 @@
 
 .display_transition{
     opacity: 1;
+    transform: translateX(0);
 }
 

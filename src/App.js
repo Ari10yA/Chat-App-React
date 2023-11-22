@@ -6,6 +6,7 @@ import ChatWindow from "./Components/LayoutChat/chatwindow"
 import { Route, Routes, Navigate } from "react-router-dom";
 import Backdrop from "./Components/Backdrop/Backdrop.jsx";
 import Modal from "./Components/Modal/modal.jsx";
+import { useNavigate } from 'react-router-dom';
 
 import './App.css';
 
@@ -13,11 +14,13 @@ import './App.css';
 
 function App() {
   const [userName, setUserName] = useState('');
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
   const [someEvents, setSomeEvents] = useState(null);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [displayBackdrop, setDisplayBackdrop] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if(userName.length !== 0) {
@@ -35,17 +38,28 @@ function App() {
     }
 
     function onConnect() {
-      setIsConnected(true);
+      
     }
 
     function onDisconnect() {
+      navigate('/');
+      setSomeEvents(null);
+      setUsers([]);
+      setSelectedUser('')
+    }
+
+    function onDisconnection() {
       setIsConnected(false);
+      setUserName('');
+      localStorage.clear();
+      socket.disconnect();
     }
 
     function onGetSession({ sessionID, userID }) {
       socket.auth = { sessionID };
       localStorage.setItem("sessionID", sessionID);
       socket.userID = userID;
+      setIsConnected(true);
     }
     
     
@@ -55,12 +69,14 @@ function App() {
     });
     socket.on("session", onGetSession);
     socket.on('disconnect', onDisconnect);
+    socket.on('disconnection-handler', onDisconnection);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('connect-error');
       socket.off("session", onGetSession);
       socket.off('disconnect', onDisconnect);
+      socket.off('disconnection-handler', onDisconnection);
     };
   }, [userName]);
 
@@ -128,14 +144,13 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={() => {displayBackdropHandler()}}>Test</button>
       <Backdrop displayHandler={displayBackdropHandler} classDetails={displayBackdrop}>
         <Modal></Modal>
       </Backdrop>
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {
-          userName?<Route path="/main" element={<ChatWindow newMessage={someEvents} selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
+          userName?<Route path="/main" element={<ChatWindow backDropHandler={displayBackdropHandler} newMessage={someEvents} selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
         }
         <Route path="*" element={<Navigate to="/"></Navigate>}></Route>
       </Routes>
