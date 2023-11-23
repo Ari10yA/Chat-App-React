@@ -5,7 +5,7 @@ import classes from "./usersWindow.module.css"
 
 const UsersWindow = (props) => {
     let users = props.users.map(user => {
-        return <User selectedUser={props.selectedUser} clickHandler={() => props.selectedUserHandler(user.userID)} key={user.userID} id={user.userID} userName={user.username} self={user.self} isConnected={user.isConnected}></User>
+        return <User newMessage={props.newMessage} selectedUser={props.selectedUser} clickHandler={() => props.selectedUserHandler(user.userID)} key={user.userID} id={user.userID} userName={user.username} self={user.self} isConnected={user.isConnected}></User>
     })
 
     return(

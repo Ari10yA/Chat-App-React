@@ -7,6 +7,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import Backdrop from "./Components/Backdrop/Backdrop.jsx";
 import Modal from "./Components/Modal/modal.jsx";
 import { useNavigate } from 'react-router-dom';
+import Logout from "./Components/Logout/logout.jsx";
 
 import './App.css';
 
@@ -22,6 +23,7 @@ function App() {
 
   const navigate = useNavigate();
 
+  //For making the connection and handling default behaviour of socket
   useEffect(() => {
     if(userName.length !== 0) {
       const sessionID = localStorage.getItem('sessionID');
@@ -80,6 +82,8 @@ function App() {
     };
   }, [userName]);
 
+
+  //used for handling socket 'some-event'
   useEffect(() => {
     function onSomeEvent(msg, id, idr) {
       const newMessage = {
@@ -145,7 +149,9 @@ function App() {
   return (
     <div className="App">
       <Backdrop displayHandler={displayBackdropHandler} classDetails={displayBackdrop}>
-        <Modal></Modal>
+        <Modal>
+          <Logout></Logout>
+        </Modal>
       </Backdrop>
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>

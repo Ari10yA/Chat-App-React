@@ -6,8 +6,33 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .user_window_selected{
     background-color: rgb(58, 39, 77);
+}
+
+.user_window__badge{
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    font-size: 0.6rem;
+    text-align: center;
+    display: none;
+}
+
+.badge_show{
+    display: block;
+}
+
+.badge_text{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }

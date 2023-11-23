@@ -8,7 +8,7 @@ const ChatWindow = (props) => {
 
     return(
         <div className={classes.main_window}>
-            <UsersWindow backDropHandler={props.backDropHandler} selectedUserHandler={props.selectedUserHandler} selectedUser={props.selectedUser} users={props.users}></UsersWindow>
+            <UsersWindow newMessage={props.newMessage} backDropHandler={props.backDropHandler} selectedUserHandler={props.selectedUserHandler} selectedUser={props.selectedUser} users={props.users}></UsersWindow>
             <UserChat  newMessage={props.newMessage} selectedUser={props.selectedUser} users={props.users} eventHandler={props.eventHandler}></UserChat>
         </div>
     )

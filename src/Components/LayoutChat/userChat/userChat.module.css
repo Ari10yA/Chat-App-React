@@ -24,7 +24,7 @@
 
 .chat_window__chats__self{
     text-align: right;
-    margin: 0.3rem 0
+    margin: 0.3rem 0;
 }
 
 .chat_window__chats__self_message{
@@ -37,6 +37,7 @@
 
 .chat_window__chats__other{
     text-align: left;
+    margin: 0.3rem 0;
 }
 
 .chat_window__chats__other_message{
