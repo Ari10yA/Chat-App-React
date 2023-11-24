@@ -8,6 +8,7 @@ import Backdrop from "./Components/Backdrop/Backdrop.jsx";
 import Modal from "./Components/Modal/modal.jsx";
 import { useNavigate } from 'react-router-dom';
 import Logout from "./Components/Logout/logout.jsx";
+import AddUser from "./Components/AddUserForm/adduser.jsx";
 
 import './App.css';
 
@@ -57,11 +58,12 @@ function App() {
       socket.disconnect();
     }
 
-    function onGetSession({ sessionID, userID }) {
+    function onGetSession({ sessionID, userID, user }) {
       socket.auth = { sessionID };
       localStorage.setItem("sessionID", sessionID);
       socket.userID = userID;
       setIsConnected(true);
+      setUsers([{...user, self: true, name: ''}]);
     }
     
     
@@ -80,7 +82,7 @@ function App() {
       socket.off('disconnect', onDisconnect);
       socket.off('disconnection-handler', onDisconnection);
     };
-  }, [userName]);
+  }, [userName, users]);
 
 
   //used for handling socket 'some-event'
@@ -101,29 +103,44 @@ function App() {
     };
   }, [someEvents]);
 
+
+  //used for handling the users coming from socket instance
   useEffect(() => {
-    const onGetUsers = (users) => {
-      let newUsers = users.map((user, index) => {
-        return {
-          ...user,
-          self: user.userID === socket.userID
-        }
+    const onGetUser = (userData) => {
+      console.log(userData);
+      let newUser = {
+        ...userData.user,
+        self: false,
+        name: ''
+      }
+      setUsers(previous => {
+        return [...previous, newUser];
       })
-
-      newUsers.sort((a, b) => {
-        if(a.self) return -1;
-        if(b.self) return 1;
-
-        if (a.username < b.username) return -1;
-        return a.username > b.username ? 1 : 0;
-      })
-      setUsers([...newUsers]);
     }
 
-    socket.on('users', onGetUsers);
+    // const onGetUsers = (users) => {
+    //   let newUsers = users.map((user, index) => {
+    //     return {
+    //       ...user,
+    //       self: user.userID === socket.userID,
+    //       name: ''
+    //     }
+    //   })
+
+    //   newUsers.sort((a, b) => {
+    //     if(a.self) return -1;
+    //     if(b.self) return 1;
+
+    //     if (a.username < b.username) return -1;
+    //     return a.username > b.username ? 1 : 0;
+    //   })
+    //   setUsers([...newUsers]);
+    // }
+
+    socket.on('add-user', onGetUser);
 
     return () => {
-      socket.off('users', onGetUsers);
+      socket.off('add-user', onGetUser);
     }
   }, [users])
 
@@ -149,10 +166,10 @@ function App() {
   return (
     <div className="App">
       <Backdrop displayHandler={displayBackdropHandler} classDetails={displayBackdrop}>
-        <Modal>
-          <Logout></Logout>
-        </Modal>
       </Backdrop>
+      <Modal displayHandler={displayBackdrop} displayChangeHandler={displayBackdropHandler}>
+          <AddUser></AddUser>
+      </Modal>
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {

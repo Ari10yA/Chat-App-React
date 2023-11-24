@@ -86,7 +86,7 @@ const UserChat = (props) => {
 
 
     let userDetails = props.users.filter(user => {
-        return user.userID==props.selectedUser;
+        return user.userID == props.selectedUser;
     })
     
     let userElement;
@@ -96,6 +96,7 @@ const UserChat = (props) => {
         userElement = 
         <>  
             <p style={{margin: "0"}}>{userDetails[0].username}</p>
+            <p style={{margin: "0"}}>{userDetails[0].userID}</p>
             <span>Online</span>
         </>
 

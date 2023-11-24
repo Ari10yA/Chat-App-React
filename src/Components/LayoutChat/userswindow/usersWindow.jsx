@@ -10,7 +10,7 @@ const UsersWindow = (props) => {
 
     return(
         <div className={classes.users_window}>
-            <button className={classes.button} onClick={() => {props.backDropHandler()}}>Logout</button>
+            <button className={classes.button} onClick={() => {props.backDropHandler()}}>Add User</button>
             {users}
         </div>
     )
