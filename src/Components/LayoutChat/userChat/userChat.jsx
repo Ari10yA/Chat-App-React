@@ -10,15 +10,19 @@ const UserChat = (props) => {
     const [chats, setChats] = useState(new Map());
     const [selectedUser, setSelectedUser] = useState('')
 
+
+    //for getting which use is selected to show its details 
     useEffect(() => {
         setSelectedUser(props.selectedUser);
     }, [props.selectedUser])
 
+
+    //for setting up the chats data according to the users
     useEffect(() => {
         let userArray = props.users.map((user) => {
             return user.userID
         })
-        let updatedMap
+        let updatedMap= new Map();
         if(chats){
             let filteredMap = new Map([
                 ...chats.entries(),
@@ -33,6 +37,8 @@ const UserChat = (props) => {
        
 
     }, [props.users]);
+
+
 
     useEffect(() => {
         if(props.newMessage){
@@ -122,7 +128,6 @@ const UserChat = (props) => {
         }
 
     }
-
 
     return(
         <div className={classes.chat_window}>

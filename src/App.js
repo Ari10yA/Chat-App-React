@@ -24,6 +24,18 @@ function App() {
 
   const navigate = useNavigate();
 
+  const userValidityCheck = (userData, id) => {
+    const searchedUser = userData.find(user => {
+      return user.userID == id;
+    })
+    if(searchedUser){
+      console.log('found from validity check');
+      return true
+    }
+    console.log('not fount from validity check');
+    return false;
+  }
+
   //For making the connection and handling default behaviour of socket
   useEffect(() => {
     if(userName.length !== 0) {
@@ -82,18 +94,40 @@ function App() {
       socket.off('disconnect', onDisconnect);
       socket.off('disconnection-handler', onDisconnection);
     };
-  }, [userName, users]);
+  }, [userName]);
 
 
   //used for handling socket 'some-event'
   useEffect(() => {
     function onSomeEvent(msg, id, idr) {
+      console.log('from some-event socket.on');
       const newMessage = {
         message: msg,
         userID: id, 
         toID: idr
       }
-      setSomeEvents(newMessage);
+      //condition to check if the message coming from a known user or not: in this its unknown
+      if(!userValidityCheck(users, id)){
+        socket.emit('add-user-req2', id, (response) => {
+          if(!userValidityCheck(users, response.user.userID)){
+            let newUser = {
+              ...response.user,
+              self: false,
+              name: ''
+            }
+      
+            setUsers(previous => {
+              return [...previous, newUser];
+            });
+          }   
+          setSomeEvents(newMessage);
+        });
+      }
+      //condition where message is coming from a known user
+      else{
+        setSomeEvents(newMessage);
+      }
+      
     }
   
     socket.on('some-event', onSomeEvent);
@@ -101,18 +135,19 @@ function App() {
     return () => {
       socket.off('some-event', onSomeEvent);
     };
-  }, [someEvents]);
+  }, [users]);
 
 
   //used for handling the users coming from socket instance
   useEffect(() => {
     const onGetUser = (userData) => {
-      console.log(userData);
+      if(userValidityCheck(users, userData.user.userID)) return;
       let newUser = {
         ...userData.user,
         self: false,
         name: ''
       }
+
       setUsers(previous => {
         return [...previous, newUser];
       })
@@ -145,6 +180,7 @@ function App() {
   }, [users])
 
 
+  
   const userNameChangeHandler = ( name ) => {
     setUserName(name);
   }

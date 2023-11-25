@@ -6,7 +6,8 @@ const AddUser = (props) => {
     
     const formSubmitHandler = (event) => {
         event.preventDefault();
-        socket.emit('add-user-req', userInput);
+        socket.emit('add-user-req', userInput, (response) => {
+        });
         props.displayChangeHandler();
     }
 
