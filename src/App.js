@@ -24,15 +24,15 @@ function App() {
 
   const navigate = useNavigate();
 
-  const userValidityCheck = (userData, id) => {
-    const searchedUser = userData.find(user => {
-      return user.userID == id;
+  const userValidityCheck = (users, id) => {
+    const searchedUser = users.find(user => {
+      return user.userID === id;
     })
     if(searchedUser){
       console.log('found from validity check');
       return true
     }
-    console.log('not fount from validity check');
+    console.log('not found from validity check');
     return false;
   }
 
@@ -75,7 +75,27 @@ function App() {
       localStorage.setItem("sessionID", sessionID);
       socket.userID = userID;
       setIsConnected(true);
-      setUsers([{...user, self: true, name: ''}]);
+      let formData = {
+        userID: userID
+      }
+      fetch('http://localhost:4000/fetchusers', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response =>{
+        return response.json()
+      })
+      .then(result => {
+        setUsers(result.data.users);
+      })
+      .catch(err => {
+        console.log(err, 'from fetch');
+      })
+
+      // setUsers([{...user, self: true, name: ''}]);
     }
     
     
@@ -100,7 +120,6 @@ function App() {
   //used for handling socket 'some-event'
   useEffect(() => {
     function onSomeEvent(msg, id, idr) {
-      console.log('from some-event socket.on');
       const newMessage = {
         message: msg,
         userID: id, 
@@ -115,6 +134,24 @@ function App() {
               self: false,
               name: ''
             }
+            // let formData = {
+            //   userID: socket.userID,
+            //   user: newUser
+            // }
+            // fetch('http://localhost:4000/addusers', {
+            //   method: "POST",
+            //   headers: {
+            //     'Content-Type': 'application/json'
+            //   },
+            //   body: JSON.stringify(formData)
+            // })
+            // .then(response => response.json())
+            // .then(result => {
+            //   console.log(result);
+            // })
+            // .catch(err => {
+            //   console.log(err, 'from fetch with addusers');
+            // })
       
             setUsers(previous => {
               return [...previous, newUser];
@@ -147,6 +184,24 @@ function App() {
         self: false,
         name: ''
       }
+      let formData = {
+        userID: socket.userID,
+        user: newUser
+      }
+      fetch('http://localhost:4000/addusers', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => {
+        console.log(err, 'from fetch with addusers');
+      })
 
       setUsers(previous => {
         return [...previous, newUser];
@@ -177,7 +232,7 @@ function App() {
     return () => {
       socket.off('add-user', onGetUser);
     }
-  }, [users])
+  }, [])
 
 
   
@@ -186,7 +241,9 @@ function App() {
   }
 
   const eventHandler = ( message, b, selectedUser ) => {
+
     socket.emit('some-event', message, socket.userID, selectedUser);
+    
   }
 
   const selectedUserHandler = (id) => {
@@ -199,6 +256,8 @@ function App() {
     })
   }
 
+  
+
   return (
     <div className="App">
       <Backdrop displayHandler={displayBackdropHandler} classDetails={displayBackdrop}>
@@ -209,7 +268,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage changeHandler={userNameChangeHandler}></Homepage>}></Route>
         {
-          userName?<Route path="/main" element={<ChatWindow backDropHandler={displayBackdropHandler} newMessage={someEvents} selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
+          userName?<Route path="/main" element={<ChatWindow backDropHandler={displayBackdropHandler} connection={isConnected} newMessage={someEvents} selectedUser={selectedUser} selectedUserHandler={selectedUserHandler} users={users} eventHandler={eventHandler}></ChatWindow>}></Route>: ''
         }
         <Route path="*" element={<Navigate to="/"></Navigate>}></Route>
       </Routes>
