@@ -1,9 +1,8 @@
-import { io } from 'socket.io-client';
+import io from "socket.io-client";
 
-const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000';
-
-const socket = io(URL, {
-    autoConnect: false
+const socket = io("http://localhost:4000", {
+  autoConnect: false,
+  withCredentials: true,
 });
 
 export default socket;

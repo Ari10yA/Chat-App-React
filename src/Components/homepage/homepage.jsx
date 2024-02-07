@@ -24,7 +24,7 @@ const Homepage = (props) => {
         <div className={classes.homepage}>       
             <form className={classes.form} onSubmit={submitFormHandler}>
                 <p className={classes.title}>ChatApp</p>
-                <input className={classes.form_input} type="text" name="username" onChange={usernameChangeHandler.bind(this)}></input>
+                <input  type="text" name="username" onChange={usernameChangeHandler.bind(this)}></input>
                 <button className={classes.form_btn} type="submit">Submit</button>
             </form>
         </div>
